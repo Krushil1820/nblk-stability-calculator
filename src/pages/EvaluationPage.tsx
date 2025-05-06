@@ -159,7 +159,7 @@ const EvaluationPage: React.FC = () => {
   const handleSubmit = async () => {
     const score = calculateCompositeScore();
   
-    // Build the payload once so it’s easy to log/debug
+    // Build the payload once so it's easy to log/debug
     const payload = {
       age_range: demographics.ageRange ?? null,
       region: demographics.region ?? null,
@@ -248,8 +248,8 @@ const EvaluationPage: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="md">
-      <Box sx={{ py: 4 }}>
+    <Container maxWidth="md" sx={{ px: { xs: 1, sm: 2 }, overflow: 'hidden' }}>
+      <Box sx={{ py: 4, width: '100%', overflow: 'hidden' }}>
         <Typography variant="h4" gutterBottom align="center">
           How Instable Do You Think Things Are?
         </Typography>

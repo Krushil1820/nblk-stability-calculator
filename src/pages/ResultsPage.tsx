@@ -204,7 +204,7 @@ const ResultsPage: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="lg">
+    <Container maxWidth="lg" sx={{ px: { xs: 1, sm: 2 }, overflow: 'hidden' }}>
       <Box
         sx={{
           minHeight: '150vh',
@@ -213,7 +213,9 @@ const ResultsPage: React.FC = () => {
           justifyContent: 'center',
           alignItems: 'center',
           py: 4,
-          px: 4,
+          px: { xs: 1, sm: 2 },
+          width: '100%',
+          overflow: 'hidden'
         }}
       >
         <AnimatePresence>

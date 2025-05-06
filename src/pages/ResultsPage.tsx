@@ -453,12 +453,12 @@ const ResultsPage: React.FC = () => {
                 </Typography>
                 <Box
                   component="img"
-                  src="/nblk.png"
+                  src="/nblk-stability-calculator/nblk.png"
                   alt="NBLK Logo"
                   sx={{
                     height: 40,
-                    mt: 2,
-                    borderRadius: 2,
+                    mt: 1,
+                    borderRadius: 1,
                   }}
                 />
               </Box>

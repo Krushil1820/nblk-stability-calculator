@@ -104,13 +104,17 @@ const initialIndicators: Indicator[] = [
   },
 ];
 
+const indicatorIds = initialIndicators.map(i => i.id);
+
 const EvaluationPage: React.FC = () => {
   const navigate = useNavigate();
   const [error, setError] = useState<string | null>(null);
   const [indicators, setIndicators] = useState<Indicator[]>(initialIndicators);
   const [demographics, setDemographics] = useState<EvaluationState['demographics']>({});
   const [currentIndicators, setCurrentIndicators] = useState<Indicator[]>(indicators);
-  const [anchorEl, setAnchorEl] = useState<{ [key: string]: HTMLElement | null }>({});
+  const [anchorEl, setAnchorEl] = useState<{ [key: string]: HTMLElement | null }>(
+    Object.fromEntries(indicatorIds.map(id => [id, null]))
+  );
 
   const handleInfoClick = (event: React.MouseEvent<HTMLElement>, id: string) => {
     setAnchorEl(prev => ({ ...prev, [id]: event.currentTarget }));
@@ -248,8 +252,8 @@ const EvaluationPage: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="md" sx={{ px: { xs: 1, sm: 2 }, overflow: 'hidden' }}>
-      <Box sx={{ py: 4, width: '100%', overflow: 'hidden' }}>
+    <Container maxWidth="md">
+      <Box sx={{ py: 4 }}>
         <Typography variant="h4" gutterBottom align="center">
           How Instable Do You Think Things Are?
         </Typography>
@@ -292,11 +296,12 @@ const EvaluationPage: React.FC = () => {
                           vertical: 'top',
                           horizontal: 'left',
                         }}
+                        disablePortal
                       >
                         <Box sx={{ p: 2, maxWidth: 400 }}>
-                          <Typography variant="h6" gutterBottom>
+                          {/* <Typography variant="h6" gutterBottom>
                             {indicatorDescriptions[indicator.id as keyof typeof indicatorDescriptions].title}
-                          </Typography>
+                          </Typography> */}
                           <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
                             {indicatorDescriptions[indicator.id as keyof typeof indicatorDescriptions].description}
                           </Typography>

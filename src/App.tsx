@@ -231,7 +231,7 @@ function App() {
         {isDarkMode ? <FaSun color="yellow" /> : <FaMoon color="black" />}
       </IconButton>
       </Tooltip>
-      <Router>
+      <Router basename="/nblk-stability-calculator">
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/evaluate" element={<EvaluationPage />} />

@@ -1,6 +1,6 @@
 {
   "name": "nblk-stability-calculator",
-  "homepage": "https://stabilitycalculator.us",
+  "homepage": "stabilitycalculator.us",
   "private": true,
   "version": "0.0.0",
   "type": "module",

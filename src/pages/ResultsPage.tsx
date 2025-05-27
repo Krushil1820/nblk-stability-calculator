@@ -255,7 +255,7 @@ const ResultsPage: React.FC = () => {
               </Typography>
               <br />
               <Typography variant="body1" paragraph sx={{ mb: 3 }}>
-                Your scores place the administration in the {getStabilityText(score)} range — suggesting major shifts in policy, governance, or national direction.
+                Your scores place the administration in the {getStabilityText(score)} range.
               </Typography>
 
               {/* Instability Score Interpretation Table (Legend)
@@ -413,29 +413,6 @@ const ResultsPage: React.FC = () => {
                   </Dialog>
                 </Box> */}
 
-              <Box sx={{ display: 'flex', justifyContent: 'center', gap: 2, mb: 4 }}>
-                <IconButton 
-                  color="primary"
-                  onClick={() => handleShare('twitter')}
-                  sx={{ color: 'primary', '&:hover': { bgcolor: 'primary' } }}
-                >
-                  <TwitterIcon />
-                </IconButton>
-                <IconButton 
-                  color="primary"
-                  onClick={() => handleShare('facebook')}
-                  sx={{ color: 'primary', '&:hover': { bgcolor: 'primary' } }}
-                >
-                  <FacebookIcon />
-                </IconButton>
-                <IconButton 
-                  color="primary"
-                  onClick={() => handleShare('linkedin')}
-                  sx={{ color: 'primary', '&:hover': { bgcolor: 'primary' } }}
-                >
-                  <LinkedInIcon />
-                </IconButton>
-              </Box>
 
               <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
                 <Button
@@ -455,7 +432,7 @@ const ResultsPage: React.FC = () => {
                 </Typography>
                 <Box
                   component="img"
-                  src="/nblk-stability-calculator/nblk.png"
+                  src="/nblk.png"
                   alt="NBLK Logo"
                   sx={{
                     height: 40,

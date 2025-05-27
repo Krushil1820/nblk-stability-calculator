@@ -184,11 +184,22 @@ const EvaluationPage: React.FC = () => {
   
       const inserted = Array.isArray(data) ? data[0] : data; // safety
   
+      const { data: avgData, error: avgError } = await supabase
+        .from('survey_responses')
+        .select('instability_ratio')
+        .throwOnError();
+  
+      let avgScore = 0;
+      if (avgData && avgData.length > 0) {
+        const total = avgData.reduce((sum, row) => sum + (row.instability_ratio || 0), 0);
+        avgScore = total / avgData.length;
+      }
+  
       const results: Results = {
         compositeScore: score,
         label: getScoreInterpretation(score).level,
         indicators: currentIndicators,
-        communityAverages: { overall: 72.1, byAge: { '30-45': 73.5 } },
+        communityAverages: { overall: avgScore, byAge: { '30-45': 73.5 } },
         surveyId: inserted.id
       };
   

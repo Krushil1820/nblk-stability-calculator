@@ -238,12 +238,12 @@ const ResultsPage: React.FC = () => {
               <Typography variant="body1" paragraph sx={{ mb: 3 }}>
                 Average Score of all Respondents: {results.communityAverages?.overall.toFixed(1)}
               </Typography>
-              <Typography variant="body1" align="center" sx={{ mt: 2 }}>
-                {getScoreInterpretation(score)}
-              </Typography>
-              <br />
+              
               <Typography variant="body1" paragraph sx={{ mb: 3 }}>
-                Your score places the administration in the {getStabilityText(score)} range.
+                Your score puts administration in {getStabilityText(score)} range.
+              </Typography>
+              <Typography variant="body1" paragraph sx={{ mb: 3 }}>
+                Average score of all users puts administration in {getStabilityText(avgScore)} range.
               </Typography>
 
               {/* Instability Score Interpretation Table (Legend)

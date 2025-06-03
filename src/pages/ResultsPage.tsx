@@ -29,27 +29,27 @@ import { styled } from '@mui/material/styles';
 import { supabase } from '../lib/supabaseClient';
 
 const getScoreColor = (score: number) => {
-  if (score <= 20) return '#4CAF50'; // Green for Very Low
-  if (score <= 40) return '#8BC34A'; // Light Green for Low
-  if (score <= 60) return '#FFC107'; // Yellow for Moderate
-  if (score <= 80) return '#FF9800'; // Orange for High
-  return '#F44336'; // Red for Extreme
+  if (score <= 20) return '#F44336'; 
+  if (score <= 40) return '#FF9800'; 
+  if (score <= 60) return '#FFC107'; 
+  if (score <= 80) return '#8BC34A';
+  return '#4CAF50'; 
 };
 
 const getStabilityIcon = (score: number) => {
-  if (score <= 20) return '🌱'; // Growing plant for Very Low
-  if (score <= 40) return '🌳'; // Tree for Low
-  if (score <= 60) return '🌪️'; // Tornado for Moderate
-  if (score <= 80) return '🔥'; // Fire for High
-  return '💥'; // Explosion for Extreme
+  if (score <= 20) return '💥'; 
+  if (score <= 40) return '🔥'; 
+  if (score <= 60) return '🌪️'; 
+  if (score <= 80) return '🌳'; 
+  return '🌱'; 
 };
 
 const getStabilityText = (score: number) => {
-  if (score <= 20) return 'Very Low Instability';
-  if (score <= 40) return 'Low Instability';
-  if (score <= 60) return 'Moderate Instability';
-  if (score <= 80) return 'High Instability';
-  return 'Extreme Instability';
+  if (score <= 20) return 'Very Unstable';
+  if (score <= 40) return 'Low Stability';
+  if (score <= 60) return 'Moderately Stable';
+  if (score <= 80) return 'Highly Stable';
+  return 'Extremely Stable';
 };
 
 const StyledLink = styled(Link)(({ theme }) => ({
@@ -70,21 +70,11 @@ interface BarChartProps {
   value: number;
   max: number;
   highlight?: boolean;
+  color?: string;
 }
 
-const AnimatedBar: React.FC<BarChartProps> = ({ label, value, max, highlight }) => {
-  const [width, setWidth] = useState(0);
-  const percent = Math.max(0, Math.min(1, value / max));
-  const finalWidth = percent * BAR_WIDTH;
-  const prevValue = useRef(0);
-
-  useEffect(() => {
-    setWidth(0);
-    const timeout = setTimeout(() => setWidth(finalWidth), 200);
-    prevValue.current = value;
-    return () => clearTimeout(timeout);
-  }, [finalWidth, value]);
-
+const AnimatedBar = ({ label, value, max, highlight, color }: BarChartProps) => {
+  const width = `${Math.min(100, Math.round((value / max) * 100))}%`;
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, width: '100%' }}>
       <Box sx={{ minWidth: 140, width: 140, color: '#8B6F00', fontWeight: 500, fontSize: { xs: 14, sm: 16 }, textAlign: 'right', pr: 1 }}>
@@ -108,7 +98,7 @@ const AnimatedBar: React.FC<BarChartProps> = ({ label, value, max, highlight }) 
           sx={{
             height: '100%',
             width: width,
-            bgcolor: FOREST_GREEN,
+            bgcolor: color || FOREST_GREEN,
             borderRadius: 2,
             transition: 'width 1.2s cubic-bezier(.4,2,.3,1)',
             boxShadow: highlight ? '0 0 8px 2px #228B2288' : undefined,
@@ -121,7 +111,6 @@ const AnimatedBar: React.FC<BarChartProps> = ({ label, value, max, highlight }) 
     </Box>
   );
 };
-
 
 const ResultsPage: React.FC = () => {
   const location = useLocation();
@@ -204,7 +193,7 @@ const ResultsPage: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="lg" sx={{ px: { xs: 1, sm: 2 }, overflow: 'hidden' }}>
+    <Container maxWidth="lg" sx={{ py: 4, overflow: 'hidden', marginTop: -8 }}>
       <Box
         sx={{
           minHeight: '150vh',
@@ -212,10 +201,10 @@ const ResultsPage: React.FC = () => {
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
-          py: 4,
-          px: { xs: 1, sm: 2 },
-          width: '100%',
-          overflow: 'hidden'
+          px: 2,
+          withwidth: '100%',
+          overflow: 'hidden',
+          margin: '0 auto',          
         }}
       >
         <AnimatePresence>
@@ -235,17 +224,16 @@ const ResultsPage: React.FC = () => {
               }}
             >
               <Typography variant="h4" component="h1" gutterBottom align="center">
-                Political In-Stability Score
+                Political Stability Score
               </Typography>
 
               <Typography variant="h6" color="text.secondary" sx={{ mb: 2 }}>
                 {getStabilityIcon(score)} {getStabilityText(score)}
               </Typography>
-              <br />
               {/* Bar Comparison Section */}
               <Box sx={{ my: 2, width: '100%', maxWidth: 400, mx: 'auto' }}>
-                <AnimatedBar label="Your Score:" value={Math.round(score)} max={maxScore} highlight />
-                <AnimatedBar label="Average Score:" value={avgScore} max={maxScore} />
+                <AnimatedBar label="Your Score:" value={Math.round(score)} max={maxScore} highlight color={getScoreColor(score)} />
+                <AnimatedBar label="Average Score:" value={avgScore} max={maxScore} color={getScoreColor(avgScore)} />
               </Box>
               <Typography variant="body1" paragraph sx={{ mb: 3 }}>
                 Average Score of all Respondents: {results.communityAverages?.overall.toFixed(1)}
@@ -255,7 +243,7 @@ const ResultsPage: React.FC = () => {
               </Typography>
               <br />
               <Typography variant="body1" paragraph sx={{ mb: 3 }}>
-                Your scores place the administration in the {getStabilityText(score)} range.
+                Your score places the administration in the {getStabilityText(score)} range.
               </Typography>
 
               {/* Instability Score Interpretation Table (Legend)
@@ -322,7 +310,7 @@ const ResultsPage: React.FC = () => {
               {/* Instability Score Interpretation Table (Legend) */}
               <Box sx={{ mt: 3, mb: 4, overflowX: 'auto' }}>
                  <Typography variant="subtitle1" sx={{ fontWeight: 700, mb: 1, textAlign: 'center' }}>
-                   Instability Score Interpretation Table
+                   Stability Score Interpretation Table
                  </Typography>
                  <Box component="table" sx={{
                    width: '100%',
@@ -339,35 +327,35 @@ const ResultsPage: React.FC = () => {
                    <Box component="thead" sx={{ background: '#f5f5f5' }}>
                      <Box component="tr">
                        <Box component="th" sx={{ p: 0.5, fontWeight: 700, borderBottom: '1.5px solid #ccc', textAlign: 'center', minWidth: 60 }}>Score Range</Box>
-                       <Box component="th" sx={{ p: 0.5, fontWeight: 700, borderBottom: '1.5px solid #ccc', textAlign: 'left', minWidth: 90 }}>Instability Level</Box>
+                       <Box component="th" sx={{ p: 0.5, fontWeight: 700, borderBottom: '1.5px solid #ccc', textAlign: 'center', minWidth: 90 }}>Stability Level</Box>
                        <Box component="th" sx={{ p: 0.5, fontWeight: 700, borderBottom: '1.5px solid #ccc', textAlign: 'center', minWidth: 120 }}>What It Means for Society</Box>
                      </Box>
                    </Box>
                    <Box component="tbody">
                      <Box component="tr">
-                       <Box component="td" sx={{ p: 0.5, borderBottom: '1px solid #eee' }}>0 – 20</Box>
-                       <Box component="td" sx={{ p: 0.5, borderBottom: '1px solid #eee' }}>Very Low Instability</Box>
-                       <Box component="td" sx={{ p: 0.5, borderBottom: '1px solid #eee' }}>People experience predictability, trust in systems, and confidence in leadership.</Box>
-                     </Box>
-                     <Box component="tr">
-                       <Box component="td" sx={{ p: 0.5, borderBottom: '1px solid #eee' }}>21 – 40</Box>
-                       <Box component="td" sx={{ p: 0.5, borderBottom: '1px solid #eee' }}>Low Instability</Box>
-                       <Box component="td" sx={{ p: 0.5, borderBottom: '1px solid #eee' }}>Most services run smoothly; occasional public concerns but little daily impact.</Box>
-                     </Box>
-                     <Box component="tr">
-                       <Box component="td" sx={{ p: 0.5, borderBottom: '1px solid #eee' }}>41 – 60</Box>
-                       <Box component="td" sx={{ p: 0.5, borderBottom: '1px solid #eee' }}>Moderate Instability</Box>
-                       <Box component="td" sx={{ p: 0.5, borderBottom: '1px solid #eee' }}>Public may feel divided or uneasy; pressure builds in specific communities or sectors.</Box>
+                       <Box component="td" sx={{ p: 0.5, borderBottom: '1px solid #eee' }}>81 – 100</Box>
+                       <Box component="td" sx={{ p: 0.5, textAlign: 'left', borderBottom: '1px solid #eee' }}>🟢 Extremely Stable</Box>
+                       <Box component="td" sx={{ p: 0.5, borderBottom: '1px solid #eee' }}>The administration appears very steady, with strong leadership and minimal disruption. People feel confident, calm, and trust that systems are working well.</Box>
                      </Box>
                      <Box component="tr">
                        <Box component="td" sx={{ p: 0.5, borderBottom: '1px solid #eee' }}>61 – 80</Box>
-                       <Box component="td" sx={{ p: 0.5, borderBottom: '1px solid #eee' }}>High Instability</Box>
-                       <Box component="td" sx={{ p: 0.5, borderBottom: '1px solid #eee' }}>People may feel anxious, polarized, or distrustful; protests or policy backlash likely.</Box>
+                       <Box component="td" sx={{ p: 0.5, textAlign: 'left', borderBottom: '1px solid #eee' }}>🟢 Highly Stable</Box>
+                       <Box component="td" sx={{ p: 0.5, borderBottom: '1px solid #eee' }}>The administration is mostly consistent, with few major problems or risks. Most people feel secure, and daily life runs smoothly.</Box>
                      </Box>
                      <Box component="tr">
-                       <Box component="td" sx={{ p: 0.5 }}>81 – 100</Box>
-                       <Box component="td" sx={{ p: 0.5 }}>Extreme Instability</Box>
-                       <Box component="td" sx={{ p: 0.5 }}>Society may face unrest, fear, rapid change, or crisis-level tension and division.</Box>
+                       <Box component="td" sx={{ p: 0.5, borderBottom: '1px solid #eee' }}>41 – 60</Box>
+                       <Box component="td" sx={{ p: 0.5, textAlign: 'left', borderBottom: '1px solid #eee' }}>🟡 Moderately Stable</Box>
+                       <Box component="td" sx={{ p: 0.5, borderBottom: '1px solid #eee' }}>The administration shows some inconsistency or uneven decision-making. People may feel mixed some tension, but no major breakdowns.</Box>
+                     </Box>
+                     <Box component="tr">
+                       <Box component="td" sx={{ p: 0.5, borderBottom: '1px solid #eee' }}>21 – 40</Box>
+                       <Box component="td" sx={{ p: 0.5, textAlign: 'left', borderBottom: '1px solid #eee' }}>🟠 Low Stability</Box>
+                       <Box component="td" sx={{ p: 0.5, borderBottom: '1px solid #eee' }}>The administration is facing leadership or policy struggles across key areas. People may feel divided, concerned, or affected by political shifts.</Box>
+                     </Box>
+                     <Box component="tr">
+                       <Box component="td" sx={{ p: 0.5, borderBottom: '1px solid #eee' }}>0 – 20</Box>
+                       <Box component="td" sx={{ p: 0.5, textAlign: 'left', borderBottom: '1px solid #eee' }}>🔴 Very Unstable</Box>
+                       <Box component="td" sx={{ p: 0.5, borderBottom: '1px solid #eee' }}>The administration is seen as highly unpredictable or dysfunctional. People may feel unsafe, angry, or unsure about the future.</Box>
                      </Box>
                    </Box>
                  </Box>

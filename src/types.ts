@@ -5,6 +5,7 @@ export interface Indicator {
   weight: number;
   grade: string;
   score: number;
+  color?: string;
 }
 
 export interface Demographics {

@@ -23,19 +23,19 @@ import InfoIcon from '@mui/icons-material/Info';
 import { supabase } from '../lib/supabaseClient';
 
 const gradeToScore: Record<string, [number, number]> = {
-  'F': [81, 100],
-  'D': [61, 80],
+  'A': [81, 100],
+  'B': [61, 80],
   'C': [41, 60],
-  'B': [21, 40],
-  'A': [0, 20],
+  'D': [21, 40],
+  'F': [0, 20],
 };
 
 const scoreToGrade = (score: number): string => {
-  if (score <= 20) return 'A';
-  if (score <= 40) return 'B';
+  if (score <= 20) return 'F';
+  if (score <= 40) return 'D';
   if (score <= 60) return 'C';
-  if (score <= 80) return 'D';
-  return 'F';
+  if (score <= 80) return 'B';
+  return 'A';
 };
 
 const indicatorDescriptions = {
@@ -67,7 +67,7 @@ const initialIndicators: Indicator[] = [
     name: 'Immigration Policy - How the government handles immigrants in the U.S.',
     description: 'How would you grade the administration on Immigration Policy?',
     weight: 0.20,
-    grade: 'F',
+    grade: 'A',
     score: 100,
   },
   {
@@ -75,7 +75,7 @@ const initialIndicators: Indicator[] = [
     name: 'Economic Management - How the government manages the economy',
     description: 'How would you grade the administration on Economic Management?',
     weight: 0.15,
-    grade: 'F',
+    grade: 'A',
     score: 100,
   },
   {
@@ -83,7 +83,7 @@ const initialIndicators: Indicator[] = [
     name: 'Foreign Policy - How the U.S. interacts with other countries',
     description: 'How would you grade the administration on Foreign Policy?',
     weight: 0.20,
-    grade: 'F',
+    grade: 'A',
     score: 100,
   },
   {
@@ -91,7 +91,7 @@ const initialIndicators: Indicator[] = [
     name: 'Domestic Policy - How the government acts within the U.S.',
     description: 'How would you grade the administration on Domestic Policy?',
     weight: 0.25,
-    grade: 'F',
+    grade: 'A',
     score: 100,
   },
   {
@@ -99,7 +99,7 @@ const initialIndicators: Indicator[] = [
     name: 'Social Policy - How the government ensures & promotes citizen\'s rights',
     description: 'How would you grade the administration on Social Policy?',
     weight: 0.2,
-    grade: 'F',
+    grade: 'A',
     score: 100,
   },
 ];
@@ -138,6 +138,14 @@ const EvaluationPage: React.FC = () => {
     );
   };
 
+  const getColorForScore = (score: number): string => {
+    if (score <= 20) return 'red';
+    if (score <= 40) return 'orange';
+    if (score <= 60) return 'gold';
+    if (score <= 80) return 'lightgreen';
+    return 'green';
+  };
+
   const handleScoreChange = (id: string, value: number) => {
     const newGrade = scoreToGrade(value);
     setCurrentIndicators(prev =>
@@ -147,6 +155,7 @@ const EvaluationPage: React.FC = () => {
               ...indicator,
               score: value,
               grade: newGrade,
+              color: getColorForScore(value),
             }
           : indicator
       )
@@ -255,18 +264,18 @@ const EvaluationPage: React.FC = () => {
   // };
 
   const getScoreInterpretation = (score: number) => {
-    if (score <= 20) return { level: 'Very Low Instability', description: 'Stable environment with minimal risks.' };
-    if (score <= 40) return { level: 'Low Instability', description: 'Some risks present, but manageable.' };
-    if (score <= 60) return { level: 'Moderate Instability', description: 'Noticeable risks that require attention.' };
-    if (score <= 80) return { level: 'High Instability', description: 'Significant risks with potential for major shifts.' };
-    return { level: 'Extreme Instability', description: 'Critical risks that could lead to severe consequences.' };
+    if (score <= 20) return { level: 'Very Unstable', description: 'Critical risks that could lead to severe consequences.' };
+    if (score <= 40) return { level: 'Low Stability', description: 'Significant risks with potential for major shifts.' };
+    if (score <= 60) return { level: 'Moderate Stability', description: 'Noticeable risks that require attention.' };
+    if (score <= 80) return { level: 'Highly Stable', description: 'Some risks present, but manageable.'};
+    return { level: 'Extremely Stable', description: 'Stable environment with minimal risks.' };
   };
 
   return (
     <Container maxWidth="md">
       <Box sx={{ py: 4 }}>
         <Typography variant="h4" gutterBottom align="center">
-          How Instable Do You Think Things Are?
+          How Stable Do You Think Things Are?
         </Typography>
 
         {error && (
@@ -321,12 +330,10 @@ const EvaluationPage: React.FC = () => {
                     </Box>
 
                     <Box sx={{ width: '100%', mb: 3 }}>
-                      {/* <Typography gutterBottom>
-                        Fine-tune Score: {indicator.score}
-                      </Typography> */}
                       <Slider
                         value={indicator.score}
-                        onChange={(_, value) => handleScoreChange(indicator.id, value as number)}
+                        onChange={(e, value) => handleScoreChange(indicator.id, value as number)}
+                        aria-labelledby="continuous-slider"
                         min={0}
                         max={100}
                         step={1}
@@ -339,20 +346,23 @@ const EvaluationPage: React.FC = () => {
                         ]}
                         valueLabelDisplay="auto"
                         valueLabelFormat={(value) => value}
+                        sx={{
+                          // Remove color changes
+                        }}
                       />
                     </Box>
 
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1 }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, }}>
                       <Typography variant="body1" sx={{ mb: 1 }}>
                         You're giving this a:
                       </Typography>
                       <Box sx={{ display: 'flex', gap: 1.2 }}>
-                        {(['A', 'B', 'C', 'D', 'F'] as const).map(grade => (
+                        {(['F', 'D', 'C', 'B', 'A'] as const).map(grade => (
                           <Button
                             key={grade}
                             variant={indicator.grade === grade ? 'contained' : 'outlined'}
-                            //onClick={() => handleGradeChange(indicator.id, grade)}
-                            sx={{ minWidth: '40px'}}
+                            onClick={() => handleGradeChange(indicator.id, grade)}
+                            sx={{ minWidth: '40px' }}
                           >
                             {grade}
                           </Button>

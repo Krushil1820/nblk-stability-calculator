@@ -352,22 +352,17 @@ const EvaluationPage: React.FC = () => {
                       />
                     </Box>
 
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1, }}>
-                      <Typography variant="body1" sx={{ mb: 1 }}>
-                        You're giving this a:
-                      </Typography>
-                      <Box sx={{ display: 'flex', gap: 1.2 }}>
-                        {(['F', 'D', 'C', 'B', 'A'] as const).map(grade => (
-                          <Button
-                            key={grade}
-                            variant={indicator.grade === grade ? 'contained' : 'outlined'}
-                            onClick={() => handleGradeChange(indicator.id, grade)}
-                            sx={{ minWidth: '40px' }}
-                          >
-                            {grade}
-                          </Button>
-                        ))}
-                      </Box>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1, justifyContent: 'center' }}>
+                      {(['F', 'D', 'C', 'B', 'A'] as const).map(grade => (
+                        <Button
+                          key={grade}
+                          variant={indicator.grade === grade ? 'contained' : 'outlined'}
+                          onClick={() => handleGradeChange(indicator.id, grade)}
+                          sx={{ minWidth: '30px' }}
+                        >
+                          {grade}
+                        </Button>
+                      ))}
                     </Box>
                   </Paper>
                 </motion.div>

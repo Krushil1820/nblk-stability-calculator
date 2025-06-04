@@ -272,7 +272,7 @@ const EvaluationPage: React.FC = () => {
   };
 
   return (
-    <Container maxWidth="md">
+    <Container maxWidth="md" sx={{ overflowX: 'hidden' }}>
       <Box sx={{ py: 4 }}>
         <Typography variant="h4" gutterBottom align="center">
           How Stable Do You Think Things Are?

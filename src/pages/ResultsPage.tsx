@@ -77,7 +77,7 @@ const AnimatedBar = ({ label, value, max, highlight, color }: BarChartProps) => 
   const width = `${Math.min(100, Math.round((value / max) * 100))}%`;
   return (
     <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, width: '100%' }}>
-      <Box sx={{ minWidth: 140, width: 140, color: '#8B6F00', fontWeight: 500, fontSize: { xs: 14, sm: 16 }, textAlign: 'right', pr: 1 }}>
+      <Box sx={{width: { xs: '30%', sm: 140 },minWidth: 80, maxWidth: 140, color: '#8B6F00', fontWeight: 500, fontSize: { xs: 14, sm: 16 }, textAlign: 'right', pr: 1 }}>
         {label}
       </Box>
       <Box

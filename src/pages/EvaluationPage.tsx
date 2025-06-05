@@ -352,13 +352,13 @@ const EvaluationPage: React.FC = () => {
                       />
                     </Box>
 
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.75, justifyContent: 'center' }}>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.65, justifyContent: 'center' }}>
                       {(['F', 'D', 'C', 'B', 'A'] as const).map(grade => (
                         <Button
                           key={grade}
                           variant={indicator.grade === grade ? 'contained' : 'outlined'}
                           onClick={() => handleGradeChange(indicator.id, grade)}
-                          sx={{ minWidth: '30px', fontSize: '0.75rem', padding: '8px 18px' }}
+                          sx={{ minWidth: '30px', fontSize: '0.8rem', padding: '5px 17px' }}
                         >
                           {grade}
                         </Button>

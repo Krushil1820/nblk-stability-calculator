@@ -14,6 +14,7 @@ export interface Demographics {
 }
 
 export interface CommunityAverages {
+  [x: string]: any;
   overall: number;
   byAge?: Record<string, number>;
 }

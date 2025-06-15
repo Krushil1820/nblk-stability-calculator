@@ -5,4 +5,10 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   base: '/',
+  server: {
+    // Add CORS headers during development
+    headers: {
+      'Access-Control-Allow-Origin': '*',
+    }
+  }
 })

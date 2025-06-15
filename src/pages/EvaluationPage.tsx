@@ -21,6 +21,7 @@ import { motion } from 'framer-motion';
 import { Indicator, Results, EvaluationState, Demographics } from '../types';
 import InfoIcon from '@mui/icons-material/Info';
 import { supabase } from '../lib/supabaseClient';
+import Footer from '../components/Footer';
 
 const gradeToScore: Record<string, [number, number]> = {
   'A': [81, 100],
@@ -322,7 +323,7 @@ const EvaluationPage: React.FC = () => {
                           {/* <Typography variant="h6" gutterBottom>
                             {indicatorDescriptions[indicator.id as keyof typeof indicatorDescriptions].title}
                           </Typography> */}
-                          <Typography variant="body2" sx={{ whiteSpace: 'pre-line' }}>
+                          <Typography variant="body2" sx={{ whiteSpace: 'pre-line', fontSize: '0.75rem' }}>
                             {indicatorDescriptions[indicator.id as keyof typeof indicatorDescriptions].description}
                           </Typography>
                         </Box>
@@ -432,6 +433,8 @@ const EvaluationPage: React.FC = () => {
             Submit Evaluation
           </Button>
         </Box>
+
+        <Footer />
       </Box>
     </Container>
   );

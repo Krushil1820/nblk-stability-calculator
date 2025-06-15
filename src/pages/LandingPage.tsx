@@ -4,6 +4,7 @@ import React from 'react';
 import { Typography, Button, Container, Paper, Box } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import Footer from '../components/Footer';
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -83,7 +84,9 @@ const LandingPage: React.FC = () => {
           <b>Open to anyone, simple to use, and made for anyone curious about where things stand.</b> <br />
           Your score reflects your view — compare your view with other respondents.
         </Typography>
+
       </Paper>
+      <Footer />
     </Container>
   );
 };

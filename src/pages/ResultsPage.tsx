@@ -14,7 +14,8 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  TextField
+  TextField,
+  CircularProgress
 } from '@mui/material';
 import { motion, AnimatePresence, color } from 'framer-motion';
 import { Results } from '../types';
@@ -27,6 +28,9 @@ import {
 } from '@mui/icons-material';
 import { styled } from '@mui/material/styles';
 import { supabase } from '../lib/supabaseClient';
+import { generatePDFReport } from '../services/pdfService';
+import { sendReportEmail } from '../services/emailService';
+import Footer from '../components/Footer';
 
 const getScoreColor = (score: number) => {
   if (score <= 20) return '#F44336'; 
@@ -156,33 +160,91 @@ const ResultsPage: React.FC = () => {
   const [openDialog, setOpenDialog] = useState(false);
   const [form, setForm] = useState({ firstName: '', lastName: '', email: '' });
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+    setError(null);
+    setSuccessMessage(null);
+
     try {
       if (!results?.surveyId) throw new Error('Survey ID not found');
-      console.log('Updating row with id:', results.surveyId);
-      const { data, error } = await supabase
-        .from('survey_responses')
-        .update({
-          first_name: form.firstName,
-          last_name:  form.lastName,
-          email:      form.email
-        })
-        .eq('id', results.surveyId)
-        .select('id')
-        .maybeSingle()
-        .throwOnError();
-      if (!data) {
-        console.warn('No row matched that id—update skipped');
-        setError('Update failed: record not found.');
-        return;
+      
+      console.log('Starting form submission process...');
+      
+      let userData = {
+        firstName: form.firstName,
+        email: form.email
+      };
+      
+      // Attempt to update user information in database
+      try {
+        console.log('Updating user information in database...');
+        const { data, error: dbError } = await supabase
+          .from('survey_responses')
+          .update({
+            first_name: form.firstName,
+            last_name: form.lastName,
+            email: form.email
+          })
+          .eq('id', results.surveyId)
+          .select('id')
+          .maybeSingle();
+
+        if (dbError) {
+          console.warn('Database update error:', dbError);
+          // Continue with PDF generation even if database update fails
+        } else if (data) {
+          console.log('Database update successful');
+        } else {
+          console.warn('No matching database record found');
+        }
+      } catch (dbErr) {
+        console.warn('Database operation failed:', dbErr);
+        // Continue with PDF generation even if database update fails
       }
-      console.log('Personal information saved successfully:', data);
-      setOpenDialog(false);
+      
+      console.log('Generating PDF...');
+      
+      // Generate PDF report
+      const pdfBuffer = await generatePDFReport(results, form.firstName);
+      console.log('PDF generated successfully');
+
+      // Send email with PDF attachment
+      console.log('Sending email with PDF attachment...');
+      await sendReportEmail(form.email, form.firstName, results, pdfBuffer);
+      console.log('Email sent successfully');
+
+      setSuccessMessage('Your report has been sent to your email address!\nCheck the Spam/Junk folder if it\'s not received.');
+      setTimeout(() => {
+        setOpenDialog(false);
+        setSuccessMessage(null);
+        setForm({ firstName: '', lastName: '', email: '' }); // Reset form
+      }, 10000);
     } catch (err: any) {
-      console.error('Error saving personal information:', err.message, err.details);
-      setError('Failed to save personal information. Please try again.');
+      console.error('Error in form submission:', err);
+      let errorMessage = 'Failed to process your request. ';
+      
+      if (err.message && err.message.includes('SendGrid Error')) {
+        errorMessage += 'There was an issue sending the email. ';
+        if (err.message.includes('authentication')) {
+          errorMessage += 'Please check the SendGrid API configuration.';
+        } else if (err.message.includes('from address')) {
+          errorMessage += 'Please verify the sender email address.';
+        } else {
+          errorMessage += err.message;
+        }
+      } else if (err.message && err.message.includes('fetch')) {
+        errorMessage = 'Network error: Could not connect to the server. This might be due to CORS restrictions in development mode.';
+      } else {
+        errorMessage += err.message || 'Please try again.';
+      }
+      
+      setError(errorMessage);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -240,10 +302,10 @@ const ResultsPage: React.FC = () => {
               </Typography>
               
               <Typography variant="body1" paragraph sx={{ mb: 3 }}>
-                Your score puts administration in {getStabilityText(score)} range.
+                You rated the administration as {getStabilityText(score)}.
               </Typography>
               <Typography variant="body1" paragraph sx={{ mb: 3 }}>
-                Average score of all users puts administration in {getStabilityText(avgScore)} range.
+                Most users rated the administration as {getStabilityText(avgScore)}.
               </Typography>
 
               {/* Instability Score Interpretation Table (Legend)
@@ -360,46 +422,76 @@ const ResultsPage: React.FC = () => {
                    </Box>
                  </Box>
                </Box>
-              {/* <Box sx={{ mb: 4 }}>
+              <Box sx={{ mb: 4 }}>
                   <Button variant="text" sx={{ p: 0, minWidth: 0, textTransform: 'none' }} onClick={handleDialogOpen}>
                     <span style={{ color: theme.palette.primary.main, textDecoration: 'underline', cursor: 'pointer', fontSize: '1rem' }}>
                       For more details on the results, please click here.
                     </span>
                   </Button>
                   <Dialog open={openDialog} onClose={handleDialogClose}>
-                    <DialogTitle>Get More Details & Updates</DialogTitle>
+                    <DialogTitle>Get Your Detailed Report</DialogTitle>
                     <form onSubmit={handleFormSubmit}>
                       <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, minWidth: 300 }}>
-                        <TextField
-                          label="First Name"
-                          name="firstName"
-                          value={form.firstName}
-                          onChange={handleFormChange}
-                          required
-                        />
-                        <TextField
-                          label="Last Name"
-                          name="lastName"
-                          value={form.lastName}
-                          onChange={handleFormChange}
-                          required
-                        />
-                        <TextField
-                          label="Email ID"
-                          name="email"
-                          type="email"
-                          value={form.email}
-                          onChange={handleFormChange}
-                          required
-                        />
+                        {successMessage ? (
+                          <Typography color="success.main" sx={{ textAlign: 'center', py: 2, whiteSpace: 'pre-line' }}>
+                            {successMessage}
+                          </Typography>
+                        ) : (
+                          <>
+                            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                              Get a detailed PDF report with your stability score analysis, including:
+                            </Typography>
+                            <ul style={{ marginTop: 0, marginBottom: 16, paddingLeft: 36, color: theme.palette.text.secondary }}>
+                              <li>Your exact score and grade</li>
+                              <li>What it means for political stability</li>
+                              <li>How your view compares to others</li>
+                            </ul>
+                            <TextField
+                              label="Preferred Name"
+                              name="firstName"
+                              value={form.firstName}
+                              onChange={handleFormChange}
+                              required
+                              fullWidth
+                              disabled={isLoading}
+                            />
+                            <TextField
+                              label="Email Address"
+                              name="email"
+                              type="email"
+                              value={form.email}
+                              onChange={handleFormChange}
+                              required
+                              fullWidth
+                              helperText="We'll send your report to this email"
+                              disabled={isLoading}
+                            />
+                            {error && (
+                              <Typography color="error" variant="body2">
+                                {error}
+                              </Typography>
+                            )}
+                          </>
+                        )}
                       </DialogContent>
                       <DialogActions>
-                        <Button onClick={handleDialogClose}>Cancel</Button>
-                        <Button type="submit" variant="contained">Get Updates</Button>
+                        <Button onClick={handleDialogClose} disabled={isLoading}>
+                          Cancel
+                        </Button>
+                        {!successMessage && (
+                          <Button 
+                            type="submit" 
+                            variant="contained"
+                            startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : <ShareIcon />}
+                            disabled={isLoading}
+                          >
+                            {isLoading ? 'Sending...' : 'Get My Report'}
+                          </Button>
+                        )}
                       </DialogActions>
                     </form>
                   </Dialog>
-                </Box> */}
+                </Box>
 
 
               <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
@@ -414,22 +506,8 @@ const ResultsPage: React.FC = () => {
                 </Button>
               </Box>
 
-              <Box sx={{ textAlign: 'center', mt: 4 }}>
-                <Typography variant="body2" color="text.secondary">
-                  © 2025 NBLK Stability Calculator
-                </Typography>
-                <Box
-                  component="img"
-                  src="/nblk.png"
-                  alt="NBLK Logo"
-                  sx={{
-                    height: 40,
-                    mt: 1,
-                    borderRadius: 1,
-                  }}
-                />
-              </Box>
             </Paper>
+            <Footer />
           </motion.div>
         </AnimatePresence>
       </Box>

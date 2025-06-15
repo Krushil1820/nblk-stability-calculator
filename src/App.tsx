@@ -91,6 +91,8 @@ import CssBaseline from '@mui/material/CssBaseline';
 import LandingPage from './pages/LandingPage';
 import EvaluationPage from './pages/EvaluationPage';
 import ResultsPage from './pages/ResultsPage';
+import AboutPage from './pages/AboutPage';
+import PrivacyPage from './pages/PrivacyPage';
 import { FaSun, FaMoon } from 'react-icons/fa';
 
 const lightTheme = createTheme({
@@ -236,6 +238,8 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/evaluate" element={<EvaluationPage />} />
           <Route path="/results" element={<ResultsPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
         </Routes>
       </Router>
     </ThemeProvider>

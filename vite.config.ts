@@ -10,5 +10,13 @@ export default defineConfig({
     headers: {
       'Access-Control-Allow-Origin': '*',
     }
+  },
+  build: {
+    rollupOptions: {
+      external: [],
+    },
+  },
+  optimizeDeps: {
+    include: ['pdf-lib']
   }
 })
